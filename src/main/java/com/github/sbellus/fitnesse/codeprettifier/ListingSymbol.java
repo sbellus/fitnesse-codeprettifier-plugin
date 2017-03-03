@@ -137,8 +137,6 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
     
     public String toTarget(Translator translator, Symbol symbol) {
         
-        System.out.println("toTarget");
-        
         HtmlTag listingSection = new HtmlTag("div");
         listingSection.addAttribute("class", "listing");
         listingSection.addAttribute("type", symbol.getProperty("type"));
@@ -158,8 +156,6 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
         pre.add(new HtmlText(symbol.getProperty("content")));
         listingSection.add(pre);
 
-        System.out.println(listingSection.html());
-        
         return listingSection.html();
     }
 }
