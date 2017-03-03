@@ -138,7 +138,12 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
     public String toTarget(Translator translator, Symbol symbol) {
         
         HtmlTag listingSection = new HtmlTag("div");
-        listingSection.addAttribute("class", "listing");
+        String divclassValue = "listing";
+        if (! symbol.getProperty("type").isEmpty())
+        {
+            divclassValue += "_" + symbol.getProperty("type"); 
+        }
+        listingSection.addAttribute("class", divclassValue);
         listingSection.addAttribute("type", symbol.getProperty("type"));
         String originalContent = trim(symbol.getProperty("content"));
         originalContent = originalContent.replaceAll("&", "&amp;");
