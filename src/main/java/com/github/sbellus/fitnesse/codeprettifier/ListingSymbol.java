@@ -143,7 +143,7 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
 
         try {
 
-            Source xmlInput = new StreamSource(new StringReader(compact(content, false, false)));
+            Source xmlInput = new StreamSource(new StringReader(compact(content, false, false, false)));
             StringWriter stringWriter = new StringWriter();
             StreamResult xmlOutput = new StreamResult(stringWriter);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -181,7 +181,7 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
                 : beginner == '{' ? SymbolType.CloseBrace : SymbolType.CloseParenthesis;
     }
 
-    private String compact(String input, Boolean keepNewLines, Boolean keepSpaces) {
+    private String compact(String input, Boolean keepNewLines, Boolean keepSpaces, Boolean transforToQuotString) {
         BufferedReader reader = new BufferedReader(new StringReader(input));
         StringBuffer result = new StringBuffer();
         
@@ -193,8 +193,10 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
                     line = line.trim();
                 }
 
-                line = line.replaceAll("&", "&amp;");
-                line = line.replaceAll("\"", "&quot;");
+                if (transforToQuotString) {
+                    line = line.replaceAll("&", "&amp;");
+                    line = line.replaceAll("\"", "&quot;");
+                }
                 
                 if (keepNewLines) {
                     line += "&\\n;";
@@ -232,7 +234,7 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
             keepSpaces = false;
         }
         
-        String originalContent = compact(symbol.getProperty("content"), keepNewLines, keepSpaces);
+        String originalContent = compact(symbol.getProperty("content"), keepNewLines, keepSpaces, true);
         listingSection.addAttribute("originalcontent", originalContent);
         listingSection.add(new RawHtml(
                 "<script src=\"/files/fitnesse/code-prettify/run_prettify.js\" type=\"text/javascript\"></script>"));
