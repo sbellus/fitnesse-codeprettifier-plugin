@@ -149,7 +149,7 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
         originalContent = originalContent.replaceAll("&", "&amp;");
         originalContent = originalContent.replaceAll("\"", "&quot;");
         listingSection.addAttribute("originalcontent", originalContent);
-        listingSection.add(new RawHtml("<script src=\"https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js\" type=\"text/javascript\"></script>"));
+        listingSection.add(new RawHtml("<script src=\"/files/fitnesse/code-prettify/run_prettify.js\" type=\"text/javascript\"></script>"));
         HtmlTag pre = new HtmlTag("pre");
         
         String prettyprintclass = "prettyprint";
