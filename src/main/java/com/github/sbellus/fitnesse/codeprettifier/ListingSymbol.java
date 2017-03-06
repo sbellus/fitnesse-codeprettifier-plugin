@@ -192,9 +192,12 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
                 if (keepSpaces == false) {
                     line = line.trim();
                 }
-            
+
+                line = line.replaceAll("&", "&amp;");
+                line = line.replaceAll("\"", "&quot;");
+                
                 if (keepNewLines) {
-                    line += "\\n";
+                    line += "&\\n;";
                 }
                 
                 result.append(line);
@@ -230,8 +233,6 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
         }
         
         String originalContent = compact(symbol.getProperty("content"), keepNewLines, keepSpaces);
-        originalContent = originalContent.replaceAll("&", "&amp;");
-        originalContent = originalContent.replaceAll("\"", "&quot;");
         listingSection.addAttribute("originalcontent", originalContent);
         listingSection.add(new RawHtml(
                 "<script src=\"/files/fitnesse/code-prettify/run_prettify.js\" type=\"text/javascript\"></script>"));
