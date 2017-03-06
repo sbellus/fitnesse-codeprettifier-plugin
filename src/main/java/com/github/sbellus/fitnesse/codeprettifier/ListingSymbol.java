@@ -46,14 +46,16 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
 
         try {
             // get output folder
-            File currentJarFile = new File(CodePrettifierPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-            String currentJarPath =  FilenameUtils.getFullPath(currentJarFile.getAbsolutePath());
-            String outputFolder = currentJarPath.replace("plugins", "FitNesseRoot" +   File.separator + "files"  + File.separator + "fitnesse");
-            
+            File currentJarFile = new File(
+                    CodePrettifierPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            String currentJarPath = FilenameUtils.getFullPath(currentJarFile.getAbsolutePath());
+            String outputFolder = currentJarPath.replace("plugins",
+                    "FitNesseRoot" + File.separator + "files" + File.separator + "fitnesse");
+
             System.out.println("Listing Plugin code-prettify folder : " + outputFolder);
-            
+
             new File(outputFolder).mkdirs();
-            
+
             // unpack code prettify scripts
             byte[] buffer = new byte[1024];
 
@@ -66,12 +68,11 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
 
             while (ze != null) {
 
-                if (ze.isDirectory())
-                {
+                if (ze.isDirectory()) {
                     ze = zis.getNextEntry();
                     continue;
                 }
-                
+
                 String fileName = ze.getName();
                 File newFile = new File(outputFolder + File.separator + fileName);
 
@@ -142,7 +143,7 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
 
         try {
 
-            Source xmlInput = new StreamSource(new StringReader(trim(content)));
+            Source xmlInput = new StreamSource(new StringReader(compact(content, false, false)));
             StringWriter stringWriter = new StringWriter();
             StreamResult xmlOutput = new StreamResult(stringWriter);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -180,14 +181,33 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
                 : beginner == '{' ? SymbolType.CloseBrace : SymbolType.CloseParenthesis;
     }
 
-    private String trim(String input) {
+    private String compact(String input, Boolean keepNewLines, Boolean keepSpaces) {
         BufferedReader reader = new BufferedReader(new StringReader(input));
         StringBuffer result = new StringBuffer();
+        
         try {
             String line;
-            while ((line = reader.readLine()) != null)
-                result.append(line.trim());
-            return result.toString();
+            while ((line = reader.readLine()) != null) {
+                
+                if (keepSpaces == false) {
+                    line = line.trim();
+                }
+            
+                if (keepNewLines) {
+                    line += "\\n";
+                }
+                
+                result.append(line);
+            }
+            
+            String compactText = result.toString();
+            
+            if (keepNewLines && compactText.length() > 2) {
+                // remove last \n
+                compactText = compactText.substring(0, compactText.length() - 2);
+            }
+            
+            return compactText;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -202,7 +222,14 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
         }
         listingSection.addAttribute("class", divclassValue);
         listingSection.addAttribute("type", symbol.getProperty("type"));
-        String originalContent = trim(symbol.getProperty("content"));
+        Boolean keepNewLines = true;
+        Boolean keepSpaces = true;
+        if (symbol.getProperty("type").contentEquals("json") || symbol.getProperty("type").contentEquals("xml")) {
+            keepNewLines = false;
+            keepSpaces = false;
+        }
+        
+        String originalContent = compact(symbol.getProperty("content"), keepNewLines, keepSpaces);
         originalContent = originalContent.replaceAll("&", "&amp;");
         originalContent = originalContent.replaceAll("\"", "&quot;");
         listingSection.addAttribute("originalcontent", originalContent);
