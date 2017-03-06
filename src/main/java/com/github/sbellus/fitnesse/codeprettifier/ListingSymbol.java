@@ -205,9 +205,9 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
             
             String compactText = result.toString();
             
-            if (keepNewLines && compactText.length() > 2) {
+            if (keepNewLines && compactText.length() > 4) {
                 // remove last \n
-                compactText = compactText.substring(0, compactText.length() - 2);
+                compactText = compactText.substring(0, compactText.length() - 4);
             }
             
             return compactText;
