@@ -24,5 +24,4 @@ The attribute ```laguage``` is optional. Can be one of ```bsh|c|cc|cpp|cs|csh|cy
 When ```xml``` or ```json``` is used then plugin also idents given text.
 
 # See also
-[graphviz-plugin](https://github.com/sbellus/fitnesse-graphviz-plugin)
-[plantuml-plugin](https://github.com/sbellus/fitnesse-plantuml-plugin)
+[graphviz-plugin](https://github.com/sbellus/fitnesse-graphviz-plugin), [plantuml-plugin](https://github.com/sbellus/fitnesse-plantuml-plugin)
