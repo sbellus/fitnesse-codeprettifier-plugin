@@ -1,35 +1,21 @@
 package com.github.sbellus.fitnesse.codeprettifier;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.io.FilenameUtils;
-import org.json.JSONObject;
-
 import fitnesse.html.HtmlTag;
 import fitnesse.html.HtmlText;
 import fitnesse.html.RawHtml;
-import fitnesse.wikitext.parser.Matcher;
-import fitnesse.wikitext.parser.Maybe;
-import fitnesse.wikitext.parser.Parser;
-import fitnesse.wikitext.parser.Rule;
-import fitnesse.wikitext.parser.Symbol;
-import fitnesse.wikitext.parser.SymbolType;
-import fitnesse.wikitext.parser.Translation;
-import fitnesse.wikitext.parser.Translator;
+import fitnesse.wikitext.parser.*;
+import org.json.JSONObject;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.regex.Pattern;
 
 public class ListingSymbol extends SymbolType implements Rule, Translation {
     private static final Pattern OptionsPattern = Pattern.compile("!listing[ \t]+([a-z]*)[ \t]*.*");
@@ -43,62 +29,6 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
         wikiMatcher(new Matcher().string("!listing").endsWith(new char[] { '(', '{', '[' }));
         wikiRule(this);
         htmlTranslation(this);
-
-        try {
-            // get output folder
-            File currentJarFile = new File(
-                    CodePrettifierPlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-            String currentJarPath = FilenameUtils.getFullPath(currentJarFile.getAbsolutePath());
-            String outputFolder = currentJarPath.replace("plugins",
-                    "FitNesseRoot" + File.separator + "files" + File.separator + "fitnesse");
-
-            System.out.println("Listing Plugin code-prettify folder : " + outputFolder);
-
-            new File(outputFolder).mkdirs();
-
-            // unpack code prettify scripts
-            byte[] buffer = new byte[1024];
-
-            InputStream is = getClass().getClassLoader().getResourceAsStream("code-prettify.zip");
-            ZipInputStream zis = new ZipInputStream(is);
-            // get the zipped file list entry
-            ZipEntry ze;
-
-            ze = zis.getNextEntry();
-
-            while (ze != null) {
-
-                if (ze.isDirectory()) {
-                    ze = zis.getNextEntry();
-                    continue;
-                }
-
-                String fileName = ze.getName();
-                File newFile = new File(outputFolder + File.separator + fileName);
-
-                // create all non exists folders
-                // else you will hit FileNotFoundException for compressed folder
-                new File(newFile.getParent()).mkdirs();
-
-                FileOutputStream fos = new FileOutputStream(newFile);
-
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-
-                fos.close();
-                ze = zis.getNextEntry();
-            }
-
-            zis.closeEntry();
-            zis.close();
-
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public Maybe<Symbol> parse(Symbol current, Parser parser) {
@@ -237,7 +167,7 @@ public class ListingSymbol extends SymbolType implements Rule, Translation {
         String originalContent = compact(symbol.getProperty("content"), keepNewLines, keepSpaces, true);
         listingSection.addAttribute("originalcontent", originalContent);
         listingSection.add(new RawHtml(
-                "<script src=\"/files/fitnesse/code-prettify/run_prettify.js\" type=\"text/javascript\"></script>"));
+                "<script src=\"files/fitnesse/code-prettify/run_prettify.js\" type=\"text/javascript\"></script>"));
         HtmlTag pre = new HtmlTag("pre");
 
         String prettyprintclass = "prettyprint";
